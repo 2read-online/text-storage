@@ -30,7 +30,7 @@ jobs:
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
-          token: 6dd62dddad719a592996501ba169bf90da398a37eecfde7856c73268b1018db9 # use secret when you're reach
+          token: 6dd62dpy ddad719a592996501ba169bf90da398a37eecfde7856c73268b1018db9 # use secret when you're reach
       - name: Log in to DO Container Registry
         run: doctl registry login --expiry-seconds 600
       - name: Tag image

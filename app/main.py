@@ -42,7 +42,7 @@ def authjwt_exception_handler(_request: Request, exc: AuthJWTException):
 
 @app.post('/text/create')
 def create(req: CreateTextRequest, authorize: AuthJWT = Depends()):
-    """Process logout request
+    """Create a new text
     """
     authorize.jwt_required()
     user_id = authorize.get_jwt_subject()
@@ -57,6 +57,8 @@ def create(req: CreateTextRequest, authorize: AuthJWT = Depends()):
 
 @app.get('/text/list')
 def list_texts(authorize: AuthJWT = Depends()):
+    """List texts of the user
+    """
     authorize.jwt_required()
     user_id = authorize.get_jwt_subject()
     texts_db = texts.find({'owner': ObjectId(user_id)})

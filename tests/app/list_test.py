@@ -1,3 +1,4 @@
+"""Test list request"""
 import json
 from bson import ObjectId
 
@@ -5,7 +6,7 @@ from tests.app.conftest import texts
 
 
 def test__list_ok(client, headers, user_id: ObjectId):
-    """Should pass valid request and return access token"""
+    """Should list texts of the logged user"""
     text_detail = {
         '_id': str(ObjectId()),
         'owner': str(user_id),
@@ -23,6 +24,7 @@ def test__list_ok(client, headers, user_id: ObjectId):
 
 
 def test__list_no_jwt(client):
+    """Should check access token"""
     resp = client.get('/text/list', headers={})
 
     assert resp.status_code == 401

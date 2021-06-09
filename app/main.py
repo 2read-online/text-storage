@@ -1,11 +1,10 @@
 """Web application"""
-from collections import Collection
-
 import logging
 from bson import ObjectId
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
+from pymongo.collection import Collection
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 

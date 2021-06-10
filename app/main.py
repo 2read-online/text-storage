@@ -9,7 +9,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from app.config import CONFIG
-from app.db import get_text_collection, Text
+from app.db import get_text_collection, Text, TextDetail
 from app.schemas import CreateTextRequest
 
 logging.basicConfig(level='DEBUG')
@@ -40,13 +40,19 @@ def authjwt_exception_handler(_request: Request, exc: AuthJWTException):
     )
 
 
+def get_current_user(req: Request) -> ObjectId:
+    """Get ID of authorized user
+        """
+    authorize = AuthJWT(req)
+    authorize.jwt_required()
+    return ObjectId(authorize.get_jwt_subject())
+
+
 @app.post('/text/create')
-def create(req: CreateTextRequest, authorize: AuthJWT = Depends()):
+async def create_text(req: CreateTextRequest, user_id: ObjectId = Depends(get_current_user)):
     """Create a new text
     """
-    authorize.jwt_required()
-    user_id = authorize.get_jwt_subject()
-    text_db = texts.find_one({'title': req.title, 'owner': ObjectId(user_id)})
+    text_db = texts.find_one({'title': req.title, 'owner': user_id})
     if text_db is not None:
         raise HTTPException(status_code=409, detail="You have already a text with this title")
 
@@ -56,10 +62,24 @@ def create(req: CreateTextRequest, authorize: AuthJWT = Depends()):
 
 
 @app.get('/text/list')
-def list_texts(authorize: AuthJWT = Depends()):
+async def list_texts(user_id: ObjectId = Depends(get_current_user)):
     """List texts of the user
     """
-    authorize.jwt_required()
-    user_id = authorize.get_jwt_subject()
-    texts_db = texts.find({'owner': ObjectId(user_id)})
-    return [Text(**text) for text in texts_db]
+    texts_db = texts.find({'owner': user_id})
+    return [TextDetail.from_db(text) for text in texts_db]
+
+
+@app.delete('/text/remove/{text_id}')
+async def remove_text(text_id: str, user_id: ObjectId = Depends(get_current_user)):
+    """Remove text
+    """
+    query = {'_id': ObjectId(text_id)}
+    text_db = texts.find_one(query)
+    if text_db is None:
+        raise HTTPException(status_code=404, detail="Text not found")
+
+    if text_db['owner'] != user_id:
+        raise HTTPException(status_code=403, detail="You have no permission to remove this text")
+
+    texts.delete_one(query)
+    return {}

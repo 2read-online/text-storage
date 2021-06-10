@@ -1,11 +1,10 @@
 # pylint: disable=redefined-outer-name
 """Test create text request"""
-import json
 import pytest
 from bson import ObjectId
 
 from app.schemas import CreateTextRequest
-from tests.app.conftest import texts
+from tests.app.conftest import texts, get_detail
 
 
 @pytest.fixture
@@ -32,7 +31,7 @@ def test__create_no_jwt(client, valid_request):
     resp = client.post('/text/create', valid_request, headers={})
 
     assert resp.status_code == 401
-    assert json.loads(resp.content)['detail'] == "Missing Authorization Header"
+    assert get_detail(resp.content) == "Missing Authorization Header"
 
 
 def test__create_title_exists(client, headers, valid_request):
@@ -42,4 +41,4 @@ def test__create_title_exists(client, headers, valid_request):
     resp = client.post('/text/create', valid_request, headers=headers)
 
     assert resp.status_code == 409
-    assert json.loads(resp.content)['detail'] == "You have already a text with this title"
+    assert get_detail(resp.content) == "You have already a text with this title"

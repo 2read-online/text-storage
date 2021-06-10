@@ -1,11 +1,11 @@
 # pylint: skip-file
-from typing import Dict
-
+import json
 import pytest
 from bson import ObjectId
 from fastapi_jwt_auth import AuthJWT
 from pymongo.collection import Collection
 from starlette.testclient import TestClient
+from typing import Dict
 from unittest.mock import Mock
 
 texts = Mock(spec=Collection)
@@ -38,3 +38,7 @@ def token(user_id: ObjectId) -> str:
 @pytest.fixture
 def headers(token: str) -> Dict[str, str]:
     return {'Authorization': f'Bearer {token}'}
+
+
+def get_detail(content: str) -> str:
+    return json.loads(content)['detail']

@@ -1,17 +1,14 @@
 """Module for working with MongoDB"""
 import logging
-from datetime import datetime
-from typing import Optional
-
 from bson import ObjectId
 from bson.errors import InvalidId
-
-from pydantic import BaseModel, BaseConfig, Field
+from datetime import datetime
+from pydantic import BaseModel, BaseConfig
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.errors import OperationFailure
-
+from typing import Optional
 
 from app.config import CONFIG
 
@@ -48,14 +45,8 @@ class OID(str):
             raise ValueError("Not a valid ObjectId") from err
 
 
-class Text(BaseModel):
-    """Text document"""
-    id: Optional[OID] = Field(alias='_id')
-    owner: OID
-    title: str
-    author: Optional[str]
-    description: Optional[str]
-    content: str
+class MongoModel(BaseModel):
+    id: Optional[OID]
 
     class Config(BaseConfig):
         """Config
@@ -73,4 +64,21 @@ class Text(BaseModel):
         if obj is None:
             return None
 
-        return Text(**obj)
+        return cls(id=obj['_id'], **obj)
+
+
+class TextDetail(MongoModel):
+    """Text detail without content"""
+    owner: OID
+    title: str
+    author: Optional[str]
+    description: Optional[str]
+
+
+class Text(MongoModel):
+    """Text document"""
+    owner: OID
+    title: str
+    author: Optional[str]
+    description: Optional[str]
+    content: str

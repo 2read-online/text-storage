@@ -9,7 +9,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from app.config import CONFIG
-from app.db import get_text_collection, Text
+from app.db import get_text_collection, Text, TextDetail
 from app.schemas import CreateTextRequest
 
 logging.basicConfig(level='DEBUG')
@@ -62,4 +62,21 @@ def list_texts(authorize: AuthJWT = Depends()):
     authorize.jwt_required()
     user_id = authorize.get_jwt_subject()
     texts_db = texts.find({'owner': ObjectId(user_id)})
-    return [Text(**text) for text in texts_db]
+    return [TextDetail.from_db(text) for text in texts_db]
+
+
+@app.delete('/text/remove/{text_id}')
+def remove(text_id: str, authorize: AuthJWT = Depends()):
+    authorize.jwt_required()
+
+    q = {'_id': ObjectId(text_id)}
+    text_db = texts.find_one(q)
+    if text_db is None:
+        raise HTTPException(status_code=404, detail="Text not found")
+
+    user_id = ObjectId(authorize.get_jwt_subject())
+    if text_db['owner'] != user_id:
+        raise HTTPException(status_code=403, detail="You have no permission to remove this text")
+
+    texts.delete_one(q)
+    return {}

@@ -2,7 +2,7 @@
 import json
 from bson import ObjectId
 
-from tests.app.conftest import texts
+from tests.app.conftest import texts, get_detail
 
 
 def test__list_ok(client, headers, user_id: ObjectId):
@@ -33,4 +33,4 @@ def test__list_no_jwt(client):
     resp = client.get('/text/list', headers={})
 
     assert resp.status_code == 401
-    assert json.loads(resp.content)['detail'] == "Missing Authorization Header"
+    assert get_detail(resp.content) == "Missing Authorization Header"

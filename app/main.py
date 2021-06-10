@@ -41,6 +41,8 @@ def authjwt_exception_handler(_request: Request, exc: AuthJWTException):
 
 
 def get_current_user(req: Request) -> ObjectId:
+    """Get ID of authorized user
+        """
     authorize = AuthJWT(req)
     authorize.jwt_required()
     return ObjectId(authorize.get_jwt_subject())
@@ -69,13 +71,15 @@ async def list_texts(user_id: ObjectId = Depends(get_current_user)):
 
 @app.delete('/text/remove/{text_id}')
 async def remove_text(text_id: str, user_id: ObjectId = Depends(get_current_user)):
-    q = {'_id': ObjectId(text_id)}
-    text_db = texts.find_one(q)
+    """Remove text
+    """
+    query = {'_id': ObjectId(text_id)}
+    text_db = texts.find_one(query)
     if text_db is None:
         raise HTTPException(status_code=404, detail="Text not found")
 
     if text_db['owner'] != user_id:
         raise HTTPException(status_code=403, detail="You have no permission to remove this text")
 
-    texts.delete_one(q)
+    texts.delete_one(query)
     return {}

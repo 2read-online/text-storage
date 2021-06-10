@@ -1,14 +1,16 @@
 """Module for working with MongoDB"""
 import logging
+from datetime import datetime
+from typing import Optional
+
 from bson import ObjectId
 from bson.errors import InvalidId
-from datetime import datetime
 from pydantic import BaseModel, BaseConfig
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.errors import OperationFailure
-from typing import Optional
+
 
 from app.config import CONFIG
 
@@ -46,6 +48,7 @@ class OID(str):
 
 
 class MongoModel(BaseModel):
+    """Base mongo document with ID"""
     id: Optional[OID]
 
     class Config(BaseConfig):

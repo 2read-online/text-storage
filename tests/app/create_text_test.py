@@ -1,6 +1,5 @@
 # pylint: disable=redefined-outer-name
 """Test create text request"""
-import json
 import pytest
 from bson import ObjectId
 

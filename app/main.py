@@ -41,7 +41,7 @@ def authjwt_exception_handler(_request: Request, exc: AuthJWTException):
 
 
 @app.post('/text/create')
-def create(req: CreateTextRequest, authorize: AuthJWT = Depends()):
+def create_text(req: CreateTextRequest, authorize: AuthJWT = Depends()):
     """Create a new text
     """
     authorize.jwt_required()
@@ -66,7 +66,7 @@ def list_texts(authorize: AuthJWT = Depends()):
 
 
 @app.delete('/text/remove/{text_id}')
-def remove(text_id: str, authorize: AuthJWT = Depends()):
+def remove_text(text_id: str, authorize: AuthJWT = Depends()):
     authorize.jwt_required()
 
     q = {'_id': ObjectId(text_id)}

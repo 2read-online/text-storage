@@ -48,6 +48,29 @@ def get_current_user(req: Request) -> ObjectId:
     return ObjectId(authorize.get_jwt_subject())
 
 
+async def find_text_and_check_permission(text_id: ObjectId, user_id: ObjectId):
+    """
+    Find text in DB and check its owner
+    :param text_id: text ID
+    :param user_id: owner ID
+    :return: found text document
+    """
+    text_db = texts.find_one({'_id': text_id})
+    if text_db is None:
+        raise HTTPException(status_code=404, detail="Text not found")
+    if text_db['owner'] != user_id:
+        raise HTTPException(status_code=403, detail="You have no permission to remove this text")
+    return text_db
+
+
+@app.get('/text/get/{text_id}')
+async def get_text(text_id: str, user_id: ObjectId = Depends(get_current_user)):
+    """Get text from DB by its ID
+    """
+    text_db = await find_text_and_check_permission(ObjectId(text_id), user_id)
+    return Text.from_db(text_db)
+
+
 @app.post('/text/create')
 async def create_text(req: CreateTextRequest, user_id: ObjectId = Depends(get_current_user)):
     """Create a new text
@@ -73,13 +96,7 @@ async def list_texts(user_id: ObjectId = Depends(get_current_user)):
 async def remove_text(text_id: str, user_id: ObjectId = Depends(get_current_user)):
     """Remove text
     """
-    query = {'_id': ObjectId(text_id)}
-    text_db = texts.find_one(query)
-    if text_db is None:
-        raise HTTPException(status_code=404, detail="Text not found")
-
-    if text_db['owner'] != user_id:
-        raise HTTPException(status_code=403, detail="You have no permission to remove this text")
-
-    texts.delete_one(query)
+    text_id = ObjectId(text_id)
+    _ = await find_text_and_check_permission(text_id, user_id)
+    texts.delete_one({'_id': text_id})
     return {}

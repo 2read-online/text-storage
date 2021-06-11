@@ -39,6 +39,11 @@ def token(user_id: ObjectId) -> str:
 def headers(token: str) -> Dict[str, str]:
     return {'Authorization': f'Bearer {token}'}
 
+@pytest.fixture
+def text_id():
+    """Random text ID"""
+    return ObjectId()
+
 
 def get_detail(content: str) -> str:
     return json.loads(content)['detail']

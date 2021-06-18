@@ -1,16 +1,14 @@
 """Module for working with MongoDB"""
 import logging
-from datetime import datetime
-from typing import Optional
-
 from bson import ObjectId
 from bson.errors import InvalidId
-from pydantic import BaseModel, BaseConfig
+from datetime import datetime
+from pydantic import BaseModel, BaseConfig, Field
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.errors import OperationFailure
-
+from typing import Optional
 
 from app.config import CONFIG
 
@@ -69,6 +67,13 @@ class MongoModel(BaseModel):
 
         return cls(id=obj['_id'], **obj)
 
+    def db(self):
+        data: dict = self.dict(exclude_none=True)
+        if 'id' in data:
+            data['_id'] = data.pop('id')
+
+        return data
+
 
 class TextDetail(MongoModel):
     """Text detail without content"""
@@ -85,3 +90,4 @@ class Text(MongoModel):
     author: Optional[str]
     description: Optional[str]
     content: str
+    cursor: int = 0

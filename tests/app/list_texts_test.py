@@ -5,15 +5,8 @@ from bson import ObjectId
 from tests.app.conftest import texts, get_detail
 
 
-def test__list_ok(client, headers, user_id: ObjectId):
+def test__list_ok(client, headers, user_id: ObjectId, text_db):
     """_Should list of texts without the content for the logged user"""
-    text_db = {
-        '_id': ObjectId(),
-        'owner': user_id,
-        'title': 'Title',
-        'content': 'Content'
-    }
-
     texts.find.return_value = [text_db]
 
     resp = client.get('/text/list', headers=headers)

@@ -10,7 +10,7 @@ from starlette.responses import JSONResponse
 
 from app.config import CONFIG
 from app.db import get_text_collection, Text, TextDetail
-from app.schemas import CreateTextRequest
+from app.schemas import CreateTextRequest, ChangeCursorRequest
 
 logging.basicConfig(level='DEBUG')
 
@@ -48,7 +48,7 @@ def get_current_user(req: Request) -> ObjectId:
     return ObjectId(authorize.get_jwt_subject())
 
 
-async def find_text_and_check_permission(text_id: ObjectId, user_id: ObjectId):
+def find_text_and_check_permission(text_id: ObjectId, user_id: ObjectId) -> Text:
     """
     Find text in DB and check its owner
     :param text_id: text ID
@@ -60,32 +60,31 @@ async def find_text_and_check_permission(text_id: ObjectId, user_id: ObjectId):
         raise HTTPException(status_code=404, detail="Text not found")
     if text_db['owner'] != user_id:
         raise HTTPException(status_code=403, detail="You have no permission to remove this text")
-    return text_db
-
-
-@app.get('/text/get/{text_id}')
-async def get_text(text_id: str, user_id: ObjectId = Depends(get_current_user)):
-    """Get text from DB by its ID
-    """
-    text_db = await find_text_and_check_permission(ObjectId(text_id), user_id)
     return Text.from_db(text_db)
 
 
+@app.get('/text/get/{text_id}')
+def get_text(text_id: str, user_id: ObjectId = Depends(get_current_user)):
+    """Get text from DB by its ID
+    """
+    return find_text_and_check_permission(ObjectId(text_id), user_id)
+
+
 @app.post('/text/create')
-async def create_text(req: CreateTextRequest, user_id: ObjectId = Depends(get_current_user)):
+def create_text(req: CreateTextRequest, user_id: ObjectId = Depends(get_current_user)):
     """Create a new text
     """
     text_db = texts.find_one({'title': req.title, 'owner': user_id})
     if text_db is not None:
         raise HTTPException(status_code=409, detail="You have already a text with this title")
 
-    text_db = Text(owner=user_id, **req.dict())
-    text_id = texts.insert_one(text_db.dict(exclude_none=True)).inserted_id
+    text = Text(owner=user_id, **req.dict())
+    text_id = texts.insert_one(text.db()).inserted_id
     return {'id': str(text_id)}
 
 
 @app.get('/text/list')
-async def list_texts(user_id: ObjectId = Depends(get_current_user)):
+def list_texts(user_id: ObjectId = Depends(get_current_user)):
     """List texts of the user
     """
     texts_db = texts.find({'owner': user_id})
@@ -93,10 +92,23 @@ async def list_texts(user_id: ObjectId = Depends(get_current_user)):
 
 
 @app.delete('/text/remove/{text_id}')
-async def remove_text(text_id: str, user_id: ObjectId = Depends(get_current_user)):
+def remove_text(text_id: str, user_id: ObjectId = Depends(get_current_user)):
     """Remove text
     """
     text_id = ObjectId(text_id)
-    _ = await find_text_and_check_permission(text_id, user_id)
+    _ = find_text_and_check_permission(text_id, user_id)
     texts.delete_one({'_id': text_id})
+    return {}
+
+
+@app.post('/text/cursor/{text_id}')
+def change_cursor(req: ChangeCursorRequest, text_id: str,
+                  user_id: ObjectId = Depends(get_current_user)):
+    """Change reading cursor
+    """
+    text_id = ObjectId(text_id)
+    text = find_text_and_check_permission(text_id, user_id)
+    text.cursor = req.cursor
+
+    texts.replace_one({'_id': text_id}, text.db())
     return {}

@@ -1,7 +1,7 @@
 """Module for working with MongoDB"""
 import logging
-from datetime import datetime
 from typing import Optional
+from datetime import datetime
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -69,6 +69,14 @@ class MongoModel(BaseModel):
 
         return cls(id=obj['_id'], **obj)
 
+    def db(self) -> dict:
+        """Export to mongo document"""
+        data: dict = self.dict(exclude_none=True)
+        if 'id' in data:
+            data['_id'] = data.pop('id')
+
+        return data
+
 
 class TextDetail(MongoModel):
     """Text detail without content"""
@@ -85,3 +93,4 @@ class Text(MongoModel):
     author: Optional[str]
     description: Optional[str]
     content: str
+    cursor: int = 0

@@ -1,14 +1,16 @@
 """Module for working with MongoDB"""
 import logging
+from typing import Optional
+from datetime import datetime
+
 from bson import ObjectId
 from bson.errors import InvalidId
-from datetime import datetime
-from pydantic import BaseModel, BaseConfig, Field
+from pydantic import BaseModel, BaseConfig
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.errors import OperationFailure
-from typing import Optional
+
 
 from app.config import CONFIG
 
@@ -67,7 +69,8 @@ class MongoModel(BaseModel):
 
         return cls(id=obj['_id'], **obj)
 
-    def db(self):
+    def db(self) -> dict:
+        """Export to mongo document"""
         data: dict = self.dict(exclude_none=True)
         if 'id' in data:
             data['_id'] = data.pop('id')

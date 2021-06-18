@@ -102,7 +102,8 @@ def remove_text(text_id: str, user_id: ObjectId = Depends(get_current_user)):
 
 
 @app.post('/text/cursor/{text_id}')
-def change_cursor(req: ChangeCursorRequest, text_id: str, user_id: ObjectId = Depends(get_current_user)):
+def change_cursor(req: ChangeCursorRequest, text_id: str,
+                  user_id: ObjectId = Depends(get_current_user)):
     """Change reading cursor
     """
     text_id = ObjectId(text_id)

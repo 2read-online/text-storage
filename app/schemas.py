@@ -9,6 +9,7 @@ class CreateTextRequest(BaseModel):
     """
     title: str = Field(max_length=127)
     content: str = Field(max_length=2 ** 20)
+    language: str = Field(max_length=3, min_length=3)
     author: Optional[str] = Field(max_length=127)
     description: Optional[str] = Field(max_length=512)
 

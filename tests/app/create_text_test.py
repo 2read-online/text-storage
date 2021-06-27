@@ -5,14 +5,16 @@ import json
 import pytest
 from bson import ObjectId
 
-from app.schemas import CreateTextRequest
 from tests.app.conftest import texts, get_detail
 
 
 @pytest.fixture
 def valid_request():
     """Valid HTTP request"""
-    return json.dumps({'title': 'Title', 'content': 'Content', 'language': 'eng', 'translationLanguage': 'rus'})
+    return json.dumps({
+        'title': 'Title', 'content': 'Content',
+        'language': 'eng', 'translationLanguage': 'rus'
+    })
 
 
 def test__create_ok(client, headers, valid_request, user_id: ObjectId):

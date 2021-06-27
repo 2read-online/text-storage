@@ -5,7 +5,7 @@ from datetime import datetime
 
 from bson import ObjectId
 from bson.errors import InvalidId
-from pydantic import BaseModel, BaseConfig
+from pydantic import BaseModel, BaseConfig, Field
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
@@ -83,17 +83,12 @@ class TextDetail(MongoModel):
     owner: OID
     title: str
     language: str
+    translation_language: str = Field(alias='translationLanguage')
     author: Optional[str]
     description: Optional[str]
 
 
-class Text(MongoModel):
+class Text(TextDetail):
     """Text document"""
-    owner: OID
-    title: str
-    language: str
-    author: Optional[str]
-    description: Optional[str]
-
     content: str
     cursor: int = 0

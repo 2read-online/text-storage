@@ -53,6 +53,7 @@ def text_db(text_id: ObjectId, user_id: ObjectId) -> dict:
         '_id': text_id,
         'owner': user_id,
         'title': 'Title',
+        'language': 'eng',
         'content': 'Content...',
         'cursor': 50
     }

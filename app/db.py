@@ -82,6 +82,7 @@ class TextDetail(MongoModel):
     """Text detail without content"""
     owner: OID
     title: str
+    language: str
     author: Optional[str]
     description: Optional[str]
 
@@ -90,7 +91,9 @@ class Text(MongoModel):
     """Text document"""
     owner: OID
     title: str
+    language: str
     author: Optional[str]
     description: Optional[str]
+
     content: str
     cursor: int = 0

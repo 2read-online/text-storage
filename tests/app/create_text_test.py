@@ -10,7 +10,7 @@ from tests.app.conftest import texts, get_detail
 @pytest.fixture
 def valid_request():
     """Valid HTTP request"""
-    return CreateTextRequest(title='Title', content='Content').json()
+    return CreateTextRequest(title='Title', content='Content', language='eng').json()
 
 
 def test__create_ok(client, headers, valid_request, user_id: ObjectId):
@@ -23,7 +23,7 @@ def test__create_ok(client, headers, valid_request, user_id: ObjectId):
 
     texts.find_one.assert_called_with({'title': 'Title', 'owner': user_id})
     texts.insert_one.assert_called_with(
-        {'owner': user_id, 'title': 'Title', 'content': 'Content', 'cursor': 0})
+        {'owner': user_id, 'title': 'Title', 'content': 'Content', 'cursor': 0, 'language': 'eng'})
 
 
 def test__create_no_jwt(client, valid_request):

@@ -82,8 +82,8 @@ class TextDetail(MongoModel):
     """Text detail without content"""
     owner: OID
     title: str
-    language: str
-    translation_language: str = Field(alias='translationLanguage')
+    source_lang: str = Field(alias='sourceLang')
+    target_lang: str = Field(alias='targetLang')
     author: Optional[str]
     description: Optional[str]
 

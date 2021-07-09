@@ -16,8 +16,8 @@ def test__list_ok(client, headers, user_id: ObjectId, text_db):
     resp_data = json.loads(resp.content)
     assert resp_data[0]['id'] == str(text_db['_id'])
     assert resp_data[0]['owner'] == str(user_id)
-    assert resp_data[0]['language'] == text_db['language']
-    assert resp_data[0]['translationLanguage'] == text_db['translation_language']
+    assert resp_data[0]['sourceLang'] == text_db['source_lang']
+    assert resp_data[0]['targetLang'] == text_db['target_lang']
     assert resp_data[0]['author'] is None
     assert resp_data[0]['description'] is None
     assert 'content' not in resp_data[0]

@@ -27,7 +27,8 @@ def test__create_ok(client, headers, valid_request, user_id: ObjectId):
 
     texts.find_one.assert_called_with({'title': 'Title', 'owner': user_id})
     texts.insert_one.assert_called_with(
-        {'owner': user_id, 'title': 'Title', 'content': 'Content', 'cursor': 0, 'source_lang': 'eng',
+        {'owner': user_id, 'title': 'Title',
+         'content': 'Content', 'cursor': 0, 'source_lang': 'eng',
          'target_lang': 'rus'})
 
 

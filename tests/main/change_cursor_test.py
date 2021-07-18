@@ -4,8 +4,8 @@ import pytest
 from bson import ObjectId
 
 from app.schemas import ChangeCursorRequest
-from tests.app.conftest import get_detail
-from tests.app.conftest import texts
+from tests.main.conftest import get_detail
+from tests.main.conftest import texts
 
 
 @pytest.fixture

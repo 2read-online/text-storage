@@ -2,7 +2,7 @@
 import json
 from bson import ObjectId
 
-from tests.app.conftest import texts, get_detail
+from tests.main.conftest import texts, get_detail
 
 
 def test__list_ok(client, headers, user_id: ObjectId, text_db):

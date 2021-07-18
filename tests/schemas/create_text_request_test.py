@@ -1,3 +1,4 @@
+"""Test CreateTextRequest"""
 import pytest
 from pydantic import ValidationError
 

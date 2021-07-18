@@ -5,7 +5,7 @@ import json
 import pytest
 from bson import ObjectId
 
-from tests.app.conftest import texts, get_detail
+from tests.main.conftest import texts, get_detail
 
 
 @pytest.fixture

@@ -7,10 +7,6 @@ services:
         REQUEREMENTS: requirements/test.txt
     volumes:
       - ./app:/service/app
-    networks:
-      2read_online:
     command: uvicorn app.main:app --reload --host 0.0.0.0
-
-networks:
-  2read_online:
-    external: true
+    ports:
+      - "8000:8000"

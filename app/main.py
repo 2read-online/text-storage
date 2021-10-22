@@ -10,7 +10,7 @@ from starlette.responses import JSONResponse
 
 from app.config import CONFIG
 from app.db import get_text_collection, Text, TextDetail
-from app.schemas import CreateTextRequest, ChangeCursorRequest
+from app.schemas import CreateTextRequest, ChangeCursorRequest, ChangeLanguageRequest
 
 logging.basicConfig(level='DEBUG')
 
@@ -109,6 +109,19 @@ def change_cursor(req: ChangeCursorRequest, text_id: str,
     text_id = ObjectId(text_id)
     text = find_text_and_check_permission(text_id, user_id)
     text.cursor = req.cursor
+
+    texts.replace_one({'_id': text_id}, text.db())
+    return {}
+
+
+@app.post('/text/target_lang/{text_id}')
+def change_target_lang(req: ChangeLanguageRequest, text_id: str,
+                       user_id: ObjectId = Depends(get_current_user)):
+    """Change reading cursor
+    """
+    text_id = ObjectId(text_id)
+    text = find_text_and_check_permission(text_id, user_id)
+    text.target_lang = req.lang
 
     texts.replace_one({'_id': text_id}, text.db())
     return {}

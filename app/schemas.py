@@ -7,12 +7,12 @@ from pydantic import BaseModel, Field
 class CreateTextRequest(BaseModel):
     """Create text request
     """
-    title: str = Field(max_length=127)
+    title: str = Field(max_length=1024)
     content: str = Field(max_length=2 ** 20)
     source_lang: str = Field(max_length=3, min_length=3, alias='sourceLang')
     target_lang: str = Field(max_length=3, min_length=3, alias='targetLang')
-    author: Optional[str] = Field(max_length=127)
-    description: Optional[str] = Field(max_length=512)
+    author: Optional[str] = Field(max_length=512)
+    description: Optional[str] = Field(max_length=1024)
 
 
 class ChangeCursorRequest(BaseModel):
